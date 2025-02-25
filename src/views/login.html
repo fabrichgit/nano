@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/ghost.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Login</title>
+</head>
+<body class="bg-gray-900 min-h-screen flex flex-col items-center justify-center">
+
+  <!-- Formulaire -->
+  <div class="bg-gray-800 text-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-3xl font-bold text-center text-blue-500 mb-6">Connexion</h1>
+    <form class="space-y-4">
+      <div>
+        <label for="username" class="block text-sm font-medium">Nom d'utilisateur :</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          required 
+          class="w-full px-4 py-2 mt-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium">Mot de passe :</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          required 
+          class="w-full px-4 py-2 mt-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+      </div>
+      <button 
+        type="submit" 
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Se connecter
+      </button>
+    </form>
+  </div>
+
+  <!-- Signature -->
+  <footer class="mt-6 text-gray-400 text-sm">
+    Développé par 
+    <a href="https://github.com/fabrichgit" target="_blank" class="text-blue-500 hover:underline">
+      Fabrich
+    </a>
+  </footer>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", async () => {
+        const url = "/auth";
+        const token = `Bearer ${localStorage.getItem("billet")}`
+
+        const data = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Authorization": token,
+                "Content-Type": "application/json",
+            },
+        })
+        if(data.ok){
+          window.location.href = "/app"
+            return
+        }else{
+            localStorage.removeItem("billet")
+            return
+        }
+    })
+  </script>
+  <script>
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formm = new FormData(form)
+      const [username, password] = [
+        formm.get("username"),
+        formm.get("password")
+      ]
+
+      // Add your form submission logic here
+      const data = await fetch(`/protected?username=${username}&&password=${password}`, {
+        method: 'GET',
+      })
+
+      if(data.ok){
+        const dt = await data.json()
+        localStorage.setItem("billet", dt.token)
+        window.location.reload()
+        return
+      }
+      if(data.status === 400){
+        alert("error")
+      }
+    });
+  </script>
+</body>
+</html>
